@@ -41,8 +41,8 @@
 	},
 	{
 		"Name": "Jessica Blake",
-		"Render": "",
-		"Team": "",
+		"Render": "https://raw.githubusercontent.com/SkyeDev10/SCW/refs/heads/main/Renders/JessicaBlake.jpg",
+		"Team": "Hart Foundation",
 		"Overall": "90",
 		"Hometown": "Seattle, Washington",
 		"Finishers": ["Vertebreaker", "GTS"]
