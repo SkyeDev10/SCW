@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shows</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			height: 100vh;
+        }
+        .nav {
+            display: block;
+			width: 100%;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px 0;
+			margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .shows-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .show-box {
+            width: 1000%;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+        .show-box h2 {
+            margin: 0;
+            background: rgba(0, 0, 0, 0);
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .show-box p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 60%;
+        }
+        .popup ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .watch-button {
+            display: block;
+            background: #ff4500;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="#">Home</a>
+        <a href="index.html">Roster</a>
+        <a href="shows.html">Shows</a>
+    </div>
+    
+    <div class="shows-container" id="shows"></div>
+    
+    <div class="overlay" id="show-popup" onclick="closePopup(event)">
+        <div class="popup" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closePopup(event)">&times;</button>
+            <img id="popup-img" src="" alt="Show Image" style="width: 100%; border-radius: 10px;">
+            <h2 id="popup-title"></h2>
+            <p id="popup-date"></p>
+            <h3>Matches</h3>
+            <ul id="popup-matches"></ul>
+            <a id="watch-link" href="#" class="watch-button">Watch Show</a>
+        </div>
+    </div>
+    
+    <script>
+        const shows = [
+            { 
+				name: "Show 1",
+				date: "March 10, 2025",
+				image: "show1.jpg",
+				matches: [
+					"Match 1", 
+					"Match 2", 
+					"Match 3"
+				], 
+				link: "#"
+			},
+            { 
+				name: "Show 2", 
+				date: "March 17, 2025", 
+				image: "show2.jpg", 
+				matches: [
+					"Match A", 
+					"Match B", 
+					"Match C"
+				], 
+				link: "#" 
+			}
+        ];
+
+        function populateShows() {
+            const container = document.getElementById("shows");
+            container.innerHTML = "";
+            shows.reverse().forEach(show => {
+                const div = document.createElement("div");
+                div.classList.add("show-box");
+                div.style.backgroundImage = `url(${show.image})`;
+                div.innerHTML = `<h2>${show.name}</h2><p>${show.date}</p>`;
+                div.onclick = () => openPopup(show);
+                container.appendChild(div);
+            });
+        }
+
+        function openPopup(show) {
+            document.getElementById("popup-img").src = show.image;
+            document.getElementById("popup-title").textContent = show.name;
+            document.getElementById("popup-date").textContent = show.date;
+            const matchList = document.getElementById("popup-matches");
+            matchList.innerHTML = "";
+            show.matches.forEach(match => {
+                const li = document.createElement("li");
+                li.textContent = match;
+                matchList.appendChild(li);
+            });
+            document.getElementById("watch-link").href = show.link;
+            document.getElementById("show-popup").style.display = "flex";
+        }
+
+        function closePopup(event) {
+            if (event.target.classList.contains("close-btn") || event.target.id === "show-popup") {
+                document.getElementById("show-popup").style.display = "none";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", populateShows);
+    </script>
+</body>
+</html>

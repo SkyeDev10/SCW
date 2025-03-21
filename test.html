@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roster Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			height: 100vh;
+        }
+        .nav {
+            display: block;
+			width: 100%;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px 0;
+			margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .section-title {
+            text-align: left;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+			display: inline-block;
+        }
+        .champions-container, .roster-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+			justify-content: center;
+			text-align: center;
+        }
+        .roster-member, .champion-box {
+            position: relative;
+            text-align: left;
+        }
+        .roster-member img, .champion-box img {
+            width: 100%;
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .roster-member:hover img, .champion-box:hover img {
+            transform: scale(1.1);
+        }
+        .roster-member .name, .champion-box .name {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="#">Home</a>
+        <a href="#">Roster</a>
+        <a href="#">Shows</a>
+    </div>
+    
+    <div class="section-title">Champions</div>
+    <div class="champions-container" id="champions"></div>
+    
+    <div class="section-title">Roster</div>
+    <div class="roster-container" id="roster"></div>
+    
+    <div class="overlay" id="overlay" onclick="closePopup(event)">
+        <div class="popup" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closePopup(event)">&times;</button>
+            <img id="popup-img" src="" alt="">
+            <h2 id="popup-name"></h2>
+            <p><strong>Hometown:</strong> <span id="popup-hometown"></span></p>
+            <p><strong>Win/Loss:</strong> <span id="popup-record"></span></p>
+            <p><strong>Finisher:</strong> <span id="popup-finisher"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const rosterMembers = [
+            { name: "Member 1", img: "https://www.thesmackdownhotel.com/images/wwe2k24/roster/asuka-2.png", hometown: "Tokyo, Japan", record: "10-2", finisher: "Asuka Lock" },
+            { name: "Member 2", img: "https://www.thesmackdownhotel.com/images/wwe2k24/roster/asuka-2.png", hometown: "Osaka, Japan", record: "8-4", finisher: "Spinning Heel Kick" },
+            { name: "Member 3", img: "https://www.thesmackdownhotel.com/images/wwe2k24/roster/asuka-2.png", hometown: "Kyoto, Japan", record: "12-1", finisher: "Superkick" },
+            { name: "Member 4", img: "https://www.thesmackdownhotel.com/images/wwe2k24/roster/asuka-2.png", hometown: "Fukuoka, Japan", record: "6-6", finisher: "Frog Splash" }
+        ];
+        
+        const champions = ["Member 1", "Member 2", "Member 3", "Member 4"];
+        
+        function createMemberElement(member) {
+            const memberDiv = document.createElement("div");
+            memberDiv.classList.add("roster-member");
+            
+            const img = document.createElement("img");
+            img.src = member.img;
+            img.alt = member.name;
+            img.onclick = () => openPopup(member);
+            
+            const name = document.createElement("div");
+            name.classList.add("name");
+            name.textContent = member.name;
+            
+            memberDiv.appendChild(img);
+            memberDiv.appendChild(name);
+            return memberDiv;
+        }
+        
+        const rosterContainer = document.getElementById("roster");
+        rosterMembers.forEach(member => rosterContainer.appendChild(createMemberElement(member)));
+        
+        const championsContainer = document.getElementById("champions");
+        champions.forEach(name => {
+            const member = rosterMembers.find(m => m.name === name);
+            if (member) {
+                championsContainer.appendChild(createMemberElement(member));
+            }
+        });
+        
+        function openPopup(member) {
+            document.getElementById("popup-img").src = member.img;
+            document.getElementById("popup-name").textContent = member.name;
+            document.getElementById("popup-hometown").textContent = member.hometown;
+            document.getElementById("popup-record").textContent = member.record;
+            document.getElementById("popup-finisher").textContent = member.finisher;
+            document.getElementById("overlay").style.display = "flex";
+        }
+        
+        function closePopup(event) {
+            if (event.target === overlay || event.target.classList.contains("close-btn")) {
+                document.getElementById("overlay").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

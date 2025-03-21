@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roster Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			height: 100vh;
+        }
+        .nav {
+            display: block;
+			width: 100%;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px 0;
+			margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .section-title {
+            text-align: left;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+			display: inline-block;
+        }
+        .champions-container, .roster-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+			justify-content: center;
+			text-align: center;
+        }
+        .roster-member, .champion-box {
+            position: relative;
+            text-align: left;
+        }
+        .roster-member img, .champion-box img {
+            width: 100%;
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .roster-member:hover img, .champion-box:hover img {
+            transform: scale(1.1);
+        }
+        .roster-member .name, .champion-box .name {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+		.champion-box {
+			position: relative;
+			text-align: center;
+		}
+		.champion-title {
+			font-size: 18px;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="#">Home</a>
+        <a href="#">Roster</a>
+        <a href="#">Shows</a>
+    </div>
+    
+    <div class="section-title">Champions</div>
+    <div class="champions-container" id="champions"></div>
+    
+    <div class="section-title">Roster</div>
+    <div class="roster-container" id="roster"></div>
+    
+    <div class="overlay" id="roster-popup" onclick="closePopup(event, 'roster-popup')">
+		<div class="popup" onclick="event.stopPropagation()">
+			<button class="close-btn" onclick="closePopup(event, 'roster-popup')">&times;</button>
+			<img id="popup-img" src="" alt="Roster Member Image">
+			<h2 id="popup-name"></h2>
+			<p><strong>Hometown:</strong> <span id="popup-hometown"></span></p>
+			<p><strong>Win/Loss:</strong> <span id="popup-record"></span></p>
+			<p><strong>Finisher:</strong> <span id="popup-finisher"></span></p>
+		</div>
+	</div>
+	
+
+	<div class="overlay" id="championship-popup" onclick="closePopup(event, 'championship-popup')">
+		<div class="popup" onclick="event.stopPropagation()">
+			<button class="close-btn" onclick="closePopup(event, 'championship-popup')">&times;</button>
+			<img id="championship-img" src="" alt="Championship Image">
+			<h2 id="championship-title"></h2>
+			<p id="championship-champion"></p>
+			<h3>Past Champions:</h3>
+			<ul id="championship-history"></ul>
+		</div>
+	</div>
+
+	<script>
+		let rosterData = []; // Global variable for roster data
+		const champions = [
+			{ title: "Title 1", name: "Jessica Blake", history: ["Wrestler A", "Wrestler B", "Wrestler C"] },
+			{ title: "Title 2", name: "Random Wrestler", history: ["Wrestler D", "Wrestler E", "Wrestler F"] },
+			{ title: "Title 3", name: "Another Wrestler", history: ["Wrestler G", "Wrestler H"] },
+			{ title: "Title 4", name: "Champion Name", history: ["Wrestler I", "Wrestler J", "Wrestler K"] }
+		];
+	
+		async function fetchRosterData() {
+			try {
+				const response = await fetch('roster.json');
+				rosterData = await response.json(); // Store data globally
+				populateRoster();
+				populateChampions();
+			} catch (error) {
+				console.error("Error loading roster:", error);
+			}
+		}
+	
+		function populateRoster() {
+			const rosterContainer = document.getElementById("roster");
+			rosterContainer.innerHTML = ""; // Clear previous content
+	
+			rosterData.forEach(member => {
+				const memberDiv = createMemberElement(member);
+				rosterContainer.appendChild(memberDiv);
+			});
+		}
+	
+		function populateChampions() {
+			const championsContainer = document.getElementById("champions");
+			championsContainer.innerHTML = ""; // Clear previous content
+	
+			champions.forEach(champ => {
+				const championData = rosterData.find(m => m.Name === champ.name) || { Render: "default-image.png", Name: champ.name };
+	
+				const champDiv = document.createElement("div");
+				champDiv.classList.add("champion-box");
+	
+				const title = document.createElement("div");
+				title.classList.add("champion-title");
+				title.textContent = champ.title;
+	
+				const img = document.createElement("img");
+				img.src = championData.Render || "default-image.png";
+				img.alt = champ.name;
+				img.onclick = () => openChampionshipPopup(champ);
+	
+				const name = document.createElement("div");
+				name.classList.add("name");
+				name.textContent = champ.name;
+	
+				champDiv.appendChild(title);
+				champDiv.appendChild(img);
+				champDiv.appendChild(name);
+				championsContainer.appendChild(champDiv);
+			});
+		}
+	
+		function createMemberElement(member) {
+			const memberDiv = document.createElement("div");
+			memberDiv.classList.add("roster-member");
+	
+			const img = document.createElement("img");
+			img.src = member.Render || "default-image.png";
+			img.alt = member.Name;
+			img.onclick = () => openPopup(member);
+	
+			const name = document.createElement("div");
+			name.classList.add("name");
+			name.textContent = member.Name;
+	
+			memberDiv.appendChild(img);
+			memberDiv.appendChild(name);
+			return memberDiv;
+		}
+	
+		function openPopup(member) {
+			document.getElementById("popup-img").src = member.Render || "default-image.png";
+			document.getElementById("popup-name").textContent = member.Name;
+			document.getElementById("popup-hometown").textContent = member.Hometown;
+			document.getElementById("popup-record").textContent = "N/A"; // Update if needed
+			document.getElementById("popup-finisher").textContent = member.Finishers.join(", ");
+			
+			document.getElementById("roster-popup").style.display = "flex"; // Ensure it shows
+		}
+
+		function closePopup(event, popupId) {
+			if (event.target.classList.contains("close-btn") || event.target.id === popupId) {
+				document.getElementById(popupId).style.display = "none";
+			}
+		}
+	
+		function openChampionshipPopup(champ) {
+			document.getElementById("championship-img").src = "championship-belt.png"; // Placeholder image
+			document.getElementById("championship-title").textContent = champ.title;
+			document.getElementById("championship-champion").textContent = "Current Champion: " + champ.name;
+	
+			const historyList = document.getElementById("championship-history");
+			historyList.innerHTML = "";
+			champ.history.forEach(pastChampion => {
+				const li = document.createElement("li");
+				li.textContent = pastChampion;
+				historyList.appendChild(li);
+			});
+	
+			document.getElementById("championship-popup").style.display = "flex";
+		}
+	
+		document.addEventListener("DOMContentLoaded", fetchRosterData);
+	</script>
+	
+	
+</body>
+</html>
